@@ -1,3 +1,4 @@
+from calendar import c
 import mysql.connector
 from tkinter import *
 
@@ -43,11 +44,28 @@ def new_client():
         add_client_button = Button(client_window, text="Dodaj nowego klienta", command=lambda: add_client(f_name_box, l_name_box, phone_box)).grid(row=4, column=0, columnspan=2)
         client_window.mainloop()
 
+def change_rent_status(id_box):
+        id = int(id_box.get())
+        query = "UPDATE samochod set stan_wypożyczenia = 'wypozyczony' WHERE id = %s"
+        data = (id,)
+        db_cursor.execute(query, data)
+        mydb.commit()
+
+
+def rent_car():
+        rent_window = Tk()
+        rent_window.geometry('300x150')
+        rent_window.title("Wypożyczenie")
+        label_id = Label(rent_window, text="Podaj id wypożyczanego samochodu:").grid(row=0, column=0, padx=30)
+        id_box = Entry(rent_window)
+        id_box.grid(row=1, column=0, pady = 20)
+        submit_button = Button(rent_window, text="Wypożycz", command=lambda:change_rent_status(id_box))
+        submit_button.grid(row=2, column=0)
 
 
 
 
-rent_button = Button(root, text='Wypożyczenie samochodu', font = 10).grid(row=0, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =5)
+rent_button = Button(root, text='Wypożyczenie samochodu', font = 10, command=rent_car).grid(row=0, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =5)
 reception_button = Button(root, text='Odbiór samochodu', font = 10).grid(row=1, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =37)
 new_client_button = Button(root, text='Nowy klient', font=10, command=new_client).grid(row=2, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =70)
 client_removal_button = Button(root, text='Usunięcie klienta', font=10).grid(row=3, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =48)
