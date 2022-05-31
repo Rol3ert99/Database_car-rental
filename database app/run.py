@@ -54,13 +54,28 @@ def change_rent_status(id_box):
 
 def rent_car():
         rent_window = Tk()
-        rent_window.geometry('300x150')
+        rent_window.geometry('520x200')
         rent_window.title("Wypożyczenie")
         label_id = Label(rent_window, text="Podaj id wypożyczanego samochodu:").grid(row=0, column=0, padx=30)
         id_box = Entry(rent_window)
-        id_box.grid(row=1, column=0, pady = 20)
+        id_box.grid(row=0, column=1, pady = 20)
+        label_client = Label(rent_window, text="Podaj id klienta").grid(row=1, column=0, padx=30)
+        client_box = Entry(rent_window)
+        client_box.grid(row=1, column=1)
         submit_button = Button(rent_window, text="Wypożycz", command=lambda:change_rent_status(id_box))
-        submit_button.grid(row=2, column=0)
+        submit_button.grid(row=3, column=1)
+        db_cursor.execute("SELECT id, imie, nazwisko, numer_telefonu FROM klient")
+        result = db_cursor.fetchall()
+        label = Label(rent_window, text="Zarejestrowani klienci: ").grid(row=4, column=0, padx=(10, 10))     
+        id_label = Label(rent_window, text="ID").grid(row=5, column=0)   
+        f_name_label = Label(rent_window, text="Imie").grid(row=5, column=1)
+        l_name_label = Label(rent_window, text="Nazwisko").grid(row=5, column=2)
+        phone_label = Label(rent_window, text="Telefon").grid(row=5, column=3)
+        for index, x in enumerate(result):
+                i = 0
+                for y in x:
+                        car_label = Label(rent_window, text=y).grid(row = index+6, column=i)
+                        i = i+1
 
 
 def reception(id_box):
