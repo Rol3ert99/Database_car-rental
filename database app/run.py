@@ -56,6 +56,23 @@ new_car_button = Button(root, text='Dodanie samochodu', font=10, state = DISABLE
 car_removal_button = Button(root, text='Usunięcie samochodu', font=10, state = DISABLED).grid(row=6, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =27)
 salary_modification_button = Button(root, text='Zmaian wynagrodzenia', font=10, state = DISABLED).grid(row=7, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =21)
 
+db_cursor.execute("SELECT id, marka, model, rok_produkcji, pojemnosc_silnika, moc_silnika, ilosc_drzwi, typ_nadwozia, color FROM samochod WHERE stan_wypożyczenia='niewypozyczony'")
+result = db_cursor.fetchall()
+label = Label(root, text="Dostępne samochody: ").grid(row=0, column=1, padx=(100, 10))
+label_car_number = Label(root, text="ID").grid(row=1, column=1)
+label_marka = Label(root, text="Marka").grid(row=1, column=2)
+label_model = Label(root, text="Model").grid(row=1, column=3)
+label_year = Label(root, text="Rok produkcji").grid(row=1, column=4)
+label_engine = Label(root, text="Silnik").grid(row=1,column=5)
+label_km = Label(root, text="Km").grid(row=1,column=6)
+label_door_number = Label(root, text="Liczba drzwi").grid(row=1,column=7)
+label_typ = Label(root, text="Nadwozie").grid(row=1, column=8)
+label_color = Label(root, text="Kolor").grid(row=1, column=9)
+for index, x in enumerate(result):
+        i = 1
+        for y in x:
+                car_label = Label(root, text=y).grid(row = index+2, column=i)
+                i = i+1
 
 
 root.mainloop()
