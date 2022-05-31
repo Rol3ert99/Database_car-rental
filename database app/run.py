@@ -154,26 +154,69 @@ def remove_client():
         remove_button = Button(client_window, text="Usuń", command=lambda: remove_client_query(id_box))
         remove_button.grid(row=0, column=4, columnspan=2)
         label = Label(client_window, text="Zarejestrowani klienci: ").grid(row=1, column=0, padx=(10, 10))     
-        id_label = Label(client_window, text="ID").grid(row=1, column=0)   
-        f_name_label = Label(client_window, text="Imie").grid(row=1, column=1)
-        l_name_label = Label(client_window, text="Nazwisko").grid(row=1, column=2)
-        phone_label = Label(client_window, text="Telefon").grid(row=1, column=3)
+        id_label = Label(client_window, text="ID").grid(row=2, column=0)   
+        f_name_label = Label(client_window, text="Imie").grid(row=2, column=1)
+        l_name_label = Label(client_window, text="Nazwisko").grid(row=2, column=2)
+        phone_label = Label(client_window, text="Telefon").grid(row=2, column=3)
         for index, x in enumerate(result):
                 i = 0
                 for y in x:
-                        car_label = Label(client_window, text=y).grid(row = index+2, column=i)
+                        car_label = Label(client_window, text=y).grid(row = index+3, column=i)
                         i = i+1
         
+
+def OC_PT_modify_query(id_car, OC_date, PT_date):
+        query = "UPDATE samochod SET 'data_waznosci_PT' = %s, SET 'data_waznosci_OC' = %s WHERE id = %s"
+        values = (str(PT_date.get()), str(OC_date.get()), int(id_car.get()))
+        db_cursor.execute(query, values)
+
+
+def OC_PT_modify():
+        modification_window = Tk()
+        modification_window.title("OC, PT")
+        modification_window.geometry('850x400')
+        modification_label = Label(modification_window, text='Podaj id samochodu, którego OC lub PT chcesz zmodyfikować: ')
+        modification_label.grid(row=0, column=0, padx = 10, pady=10)
+        modification_box = Entry(modification_window)
+        modification_box.grid(row=0, column=1)
+        OC_label = Label(modification_window, text="Wprowadź nowy termin ważnosci OC: ")
+        OC_label.grid(row=1, column=0)
+        OC_box = Entry(modification_window)
+        OC_box.grid(row=1, column=1)
+        PT_label = Label(modification_window, text="Wprowadź nowy termin ważnosci PT: ")
+        PT_label.grid(row=2, column=0, pady=10)
+        PT_box = Entry(modification_window)
+        PT_box.grid(row=2, column=1, pady=10)
+        cars_label = Label(modification_window, text="Samochody: ")
+        cars_label.grid(row=3, column=0, sticky=W)
+        submit_button = Button(modification_window, text="Zatwierdź", command = lambda: OC_PT_modify_query(modification_box, OC_box, PT_box))
+        submit_button.grid(row=1, column = 2, columnspan=2, ipadx=10)
+        db_cursor.execute("SELECT id, marka, model, rok_produkcji, pojemnosc_silnika, data_waznosci_PT, data_waznosci_OC, color FROM samochod")
+        result = db_cursor.fetchall()
+        label_car_number = Label(modification_window, text="ID").grid(row=4, column=0)
+        label_marka = Label(modification_window, text="Marka").grid(row=4, column=1)
+        label_model = Label(modification_window, text="Model").grid(row=4, column=2)
+        label_year = Label(modification_window, text="Rok produkcji").grid(row=4, column=3)
+        label_engine = Label(modification_window, text="Silnik").grid(row=4,column=4)
+        label_PT = Label(modification_window, text="PT").grid(row=4, column=5)
+        label_OC = Label(modification_window, text="OC").grid(row=4, column=6)
+        label_color = Label(modification_window, text="Kolor").grid(row=4, column=7)
+        for index, x in enumerate(result):
+                i = 0
+                for y in x:
+                        car_label = Label(modification_window, text=y).grid(row = index+5, column=i)
+                        i = i+1
+
+
 
 rent_button = Button(root, text='Wypożyczenie samochodu', font = 10, command=rent_car).grid(row=0, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =5)
 reception_button = Button(root, text='Odbiór samochodu', font = 10, command=reception_car).grid(row=1, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =37)
 new_client_button = Button(root, text='Nowy klient', font=10, command=new_client).grid(row=2, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =70)
 client_removal_button = Button(root, text='Usunięcie klienta', font=10, command=remove_client).grid(row=3, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =48)
-modification_button = Button(root, text='Modyfikacja OC lub PT', font=10).grid(row=4, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =19)
+modification_button = Button(root, text='Modyfikacja OC lub PT', font=10, command=OC_PT_modify).grid(row=4, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =19)
 new_car_button = Button(root, text='Dodanie samochodu', font=10, state = DISABLED).grid(row=5, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =32)
 car_removal_button = Button(root, text='Usunięcie samochodu', font=10, state = DISABLED).grid(row=6, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =27)
 salary_modification_button = Button(root, text='Zmaian wynagrodzenia', font=10, state = DISABLED).grid(row=7, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =21)
-
 
 
 show_available_cars()
