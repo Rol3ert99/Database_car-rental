@@ -98,15 +98,6 @@ def reception_car():
                         i = i+1
 
 
-rent_button = Button(root, text='Wypożyczenie samochodu', font = 10, command=rent_car).grid(row=0, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =5)
-reception_button = Button(root, text='Odbiór samochodu', font = 10, command=reception_car).grid(row=1, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =37)
-new_client_button = Button(root, text='Nowy klient', font=10, command=new_client).grid(row=2, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =70)
-client_removal_button = Button(root, text='Usunięcie klienta', font=10).grid(row=3, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =48)
-modification_button = Button(root, text='Modyfikacja OC lub PT', font=10).grid(row=4, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =19)
-new_car_button = Button(root, text='Dodanie samochodu', font=10, state = DISABLED).grid(row=5, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =32)
-car_removal_button = Button(root, text='Usunięcie samochodu', font=10, state = DISABLED).grid(row=6, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =27)
-salary_modification_button = Button(root, text='Zmaian wynagrodzenia', font=10, state = DISABLED).grid(row=7, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =21)
-
 def show_available_cars():
         db_cursor.execute("SELECT id, marka, model, rok_produkcji, pojemnosc_silnika, moc_silnika, ilosc_drzwi, typ_nadwozia, color FROM samochod WHERE stan_wypożyczenia='niewypozyczony'")
         result = db_cursor.fetchall()
@@ -125,6 +116,51 @@ def show_available_cars():
                 for y in x:
                         car_label = Label(root, text=y).grid(row = index+2, column=i)
                         i = i+1
+
+
+def remove_client_query(id_box):
+        id = int(id_box.get())
+        query = "DELETE FROM klient WHERE id = %s"
+        data = (id,)
+        db_cursor.execute(query, data)
+        mydb.commit()        
+
+
+def remove_client():
+        client_window = Tk()
+        client_window.geometry('400x400')
+        client_window.title('Usunięcie klienta')
+        db_cursor.execute("SELECT id, imie, nazwisko, numer_telefonu, data_ostatniego_wypozyczenia FROM klient")
+        result = db_cursor.fetchall()
+        id_label = Label(client_window, text="Podaj id klienta: ")
+        id_label.grid(row=0, column=0, columnspan=2)
+        id_box = Entry(client_window)
+        id_box.grid(row=0, column=2, columnspan=2, pady=20)
+        remove_button = Button(client_window, text="Usuń", command=lambda: remove_client_query(id_box))
+        remove_button.grid(row=0, column=4, columnspan=2)
+        label = Label(client_window, text="Zarejestrowani klienci: ").grid(row=1, column=0, padx=(10, 10))     
+        id_label = Label(client_window, text="ID").grid(row=1, column=0)   
+        f_name_label = Label(client_window, text="Imie").grid(row=1, column=1)
+        l_name_label = Label(client_window, text="Nazwisko").grid(row=1, column=2)
+        phone_label = Label(client_window, text="Telefon").grid(row=1, column=3)
+        for index, x in enumerate(result):
+                i = 0
+                for y in x:
+                        car_label = Label(client_window, text=y).grid(row = index+2, column=i)
+                        i = i+1
+        
+
+rent_button = Button(root, text='Wypożyczenie samochodu', font = 10, command=rent_car).grid(row=0, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =5)
+reception_button = Button(root, text='Odbiór samochodu', font = 10, command=reception_car).grid(row=1, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =37)
+new_client_button = Button(root, text='Nowy klient', font=10, command=new_client).grid(row=2, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =70)
+client_removal_button = Button(root, text='Usunięcie klienta', font=10, command=remove_client).grid(row=3, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =48)
+modification_button = Button(root, text='Modyfikacja OC lub PT', font=10).grid(row=4, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =19)
+new_car_button = Button(root, text='Dodanie samochodu', font=10, state = DISABLED).grid(row=5, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =32)
+car_removal_button = Button(root, text='Usunięcie samochodu', font=10, state = DISABLED).grid(row=6, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =27)
+salary_modification_button = Button(root, text='Zmaian wynagrodzenia', font=10, state = DISABLED).grid(row=7, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =21)
+
+
+
 show_available_cars()
 
 
