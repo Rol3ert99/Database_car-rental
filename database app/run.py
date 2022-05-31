@@ -63,10 +63,43 @@ def rent_car():
         submit_button.grid(row=2, column=0)
 
 
+def reception(id_box):
+        id = int(id_box.get())
+        query = "UPDATE samochod set stan_wypożyczenia = 'niewypozyczony' WHERE id = %s"
+        data = (id,)
+        db_cursor.execute(query, data)
+        mydb.commit()
+
+
+def reception_car():
+        db_cursor.execute("SELECT id, marka, model, rok_produkcji, pojemnosc_silnika, moc_silnika,  color FROM samochod WHERE stan_wypożyczenia='wypozyczony'")
+        result = db_cursor.fetchall()
+        reception_window = Tk()
+        reception_window.title("Odbiór")
+        reception_window.geometry('700x300')
+        id_label = Label(reception_window, text="Podaj id odbieranego samochodu: ")
+        id_label.grid(row=0, column=0, columnspan=2)
+        id_box = Entry(reception_window)
+        id_box.grid(row=0, column=2, columnspan=2, pady=20)
+        reception_button = Button(reception_window, text="Odbierz", command=lambda: reception(id_box))
+        reception_button.grid(row=0, column=4, columnspan=2)
+        label = Label(reception_window, text="Wypożyczone samochody: ").grid(row=1, column=0, padx=(10, 10))
+        label_car_number = Label(reception_window, text="ID").grid(row=2, column=0)
+        label_marka = Label(reception_window, text="Marka").grid(row=2, column=1)
+        label_model = Label(reception_window, text="Model").grid(row=2, column=2)
+        label_year = Label(reception_window, text="Rok produkcji").grid(row=2, column=3)
+        label_engine = Label(reception_window, text="Silnik").grid(row=2,column=4)
+        label_km = Label(reception_window, text="Km").grid(row=2,column=5)
+        label_color = Label(reception_window, text="Kolor").grid(row=2, column=6)
+        for index, x in enumerate(result):
+                i = 0
+                for y in x:
+                        car_label = Label(reception_window, text=y).grid(row = index+3, column=i)
+                        i = i+1
 
 
 rent_button = Button(root, text='Wypożyczenie samochodu', font = 10, command=rent_car).grid(row=0, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =5)
-reception_button = Button(root, text='Odbiór samochodu', font = 10).grid(row=1, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =37)
+reception_button = Button(root, text='Odbiór samochodu', font = 10, command=reception_car).grid(row=1, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =37)
 new_client_button = Button(root, text='Nowy klient', font=10, command=new_client).grid(row=2, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =70)
 client_removal_button = Button(root, text='Usunięcie klienta', font=10).grid(row=3, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =48)
 modification_button = Button(root, text='Modyfikacja OC lub PT', font=10).grid(row=4, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =19)
@@ -74,23 +107,25 @@ new_car_button = Button(root, text='Dodanie samochodu', font=10, state = DISABLE
 car_removal_button = Button(root, text='Usunięcie samochodu', font=10, state = DISABLED).grid(row=6, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =27)
 salary_modification_button = Button(root, text='Zmaian wynagrodzenia', font=10, state = DISABLED).grid(row=7, column=0, sticky = W, padx = 10, pady = 5, ipady=5, ipadx =21)
 
-db_cursor.execute("SELECT id, marka, model, rok_produkcji, pojemnosc_silnika, moc_silnika, ilosc_drzwi, typ_nadwozia, color FROM samochod WHERE stan_wypożyczenia='niewypozyczony'")
-result = db_cursor.fetchall()
-label = Label(root, text="Dostępne samochody: ").grid(row=0, column=1, padx=(100, 10))
-label_car_number = Label(root, text="ID").grid(row=1, column=1)
-label_marka = Label(root, text="Marka").grid(row=1, column=2)
-label_model = Label(root, text="Model").grid(row=1, column=3)
-label_year = Label(root, text="Rok produkcji").grid(row=1, column=4)
-label_engine = Label(root, text="Silnik").grid(row=1,column=5)
-label_km = Label(root, text="Km").grid(row=1,column=6)
-label_door_number = Label(root, text="Liczba drzwi").grid(row=1,column=7)
-label_typ = Label(root, text="Nadwozie").grid(row=1, column=8)
-label_color = Label(root, text="Kolor").grid(row=1, column=9)
-for index, x in enumerate(result):
-        i = 1
-        for y in x:
-                car_label = Label(root, text=y).grid(row = index+2, column=i)
-                i = i+1
+def show_available_cars():
+        db_cursor.execute("SELECT id, marka, model, rok_produkcji, pojemnosc_silnika, moc_silnika, ilosc_drzwi, typ_nadwozia, color FROM samochod WHERE stan_wypożyczenia='niewypozyczony'")
+        result = db_cursor.fetchall()
+        label = Label(root, text="Dostępne samochody: ").grid(row=0, column=1, padx=(100, 10))
+        label_car_number = Label(root, text="ID").grid(row=1, column=1)
+        label_marka = Label(root, text="Marka").grid(row=1, column=2)
+        label_model = Label(root, text="Model").grid(row=1, column=3)
+        label_year = Label(root, text="Rok produkcji").grid(row=1, column=4)
+        label_engine = Label(root, text="Silnik").grid(row=1,column=5)
+        label_km = Label(root, text="Km").grid(row=1,column=6)
+        label_door_number = Label(root, text="Liczba drzwi").grid(row=1,column=7)
+        label_typ = Label(root, text="Nadwozie").grid(row=1, column=8)
+        label_color = Label(root, text="Kolor").grid(row=1, column=9)
+        for index, x in enumerate(result):
+                i = 1
+                for y in x:
+                        car_label = Label(root, text=y).grid(row = index+2, column=i)
+                        i = i+1
+show_available_cars()
 
 
 root.mainloop()
