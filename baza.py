@@ -361,6 +361,7 @@ def salary_modufy_query(id_worker, new_salary):
     values = (new_salary.get(), id_worker.get())
     db_cursor.execute(query, values)
 
+
 def salary_modify():
         modification_window = Tk()
         modification_window.title("Wynagrodzenia")
@@ -420,11 +421,11 @@ car_removal_button = Button(root, text='Usunięcie samochodu', font=10, state=DI
 new_worker_button = Button(root, text='Nowy pracownik', font=10, command=new_worker).grid(row=7, column=0,
                                                                                                      sticky=W, padx=10,
                                                                                                      pady=5, ipady=5,
-                                                                                                     ipadx=21)
+                                                                                                     ipadx=50)
 remove_worker_button = Button(root, text='Zwolnij pracownika', font=10, command=remove_worker).grid(row=8, column=0,
                                                                                                      sticky=W, padx=10,
                                                                                                      pady=5, ipady=5,
-                                                                                                     ipadx=21)
+                                                                                                     ipadx=39)
 salary_modification_button = Button(root, text='Zmiana wynagrodzenia', font=10, command=salary_modify).grid(row=9, column=0,
                                                                                                      sticky=W, padx=10,
                                                                                                      pady=5, ipady=5,
