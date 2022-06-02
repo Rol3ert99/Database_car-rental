@@ -1,6 +1,9 @@
 from calendar import c
 import mysql.connector
 from tkinter import *
+import os
+
+worker_id = 13
 
 root = Tk()
 root.geometry("1200x700")
@@ -51,6 +54,7 @@ def change_rent_status(id_box):
     query = "UPDATE samochod set stan_wypożyczenia = 'wypozyczony' WHERE id = %s"
     data = (id,)
     db_cursor.execute(query, data)
+    id_box.delete(0, END)
     mydb.commit()
 
 
@@ -78,13 +82,15 @@ def rent_car():
         for y in x:
             car_label = Label(rent_window, text=y).grid(row=index + 6, column=i)
             i = i + 1
-
+    id_box.delete(0,END)
+    client_box.delete(0,END)
 
 def reception(id_box):
     id = int(id_box.get())
     query = "UPDATE samochod set stan_wypożyczenia = 'niewypozyczony' WHERE id = %s"
     data = (id,)
     db_cursor.execute(query, data)
+    id_box.delete(0, END)
     mydb.commit()
 
 
@@ -114,7 +120,7 @@ def reception_car():
         for y in x:
             car_label = Label(reception_window, text=y).grid(row=index + 3, column=i)
             i = i + 1
-
+    id_box.delete(0, END)
 
 def show_available_cars():
     db_cursor.execute(
@@ -167,7 +173,7 @@ def remove_client():
         for y in x:
             car_label = Label(client_window, text=y).grid(row=index + 2, column=i)
             i = i + 1
-
+    id_box.delete(0, END)
 
 def add_car(make, model, year, displacement, power, door_num, chasis_type, reception_status, PT, OC, price, color):
         query = "INSERT INTO samochod (marka, model, rok_produkcji, pojemnosc_silnika, moc_silnika, ilosc_drzwi, typ_nadwozia, stan_wypożyczenia, data_waznosci_PT, data_waznosci_OC, cena_dobowa_wypozyczenia, color) VALUES (%s, %s, %s ,%s, %s, %s, %s, %s, %s, %s, %s,%s)"
@@ -361,7 +367,6 @@ def salary_modufy_query(id_worker, new_salary):
     values = (new_salary.get(), id_worker.get())
     db_cursor.execute(query, values)
 
-
 def salary_modify():
         modification_window = Tk()
         modification_window.title("Wynagrodzenia")
@@ -394,7 +399,77 @@ def salary_modify():
             for y in x:
                 car_label = Label(modification_window, text=y).grid(row=index + 5, column=i)
                 i = i + 1
+def sign_in_func(last_name, password):
+    query = ("SELECT id FROM pracownik WHERE nazwisko=%s AND haslo= %s")
+    value = (last_name.get(),password.get())
+    db_cursor.execute(query,value)
+    result = db_cursor.fetchall()
+    global worker_id
+    print("before " + str(worker_id))
+    worker_id = result[0][0]
+    print(result[0][0])
+    print(worker_id)
 
+
+
+
+def sign_in():
+    login_window = Tk()
+    login_window.geometry("280x250")
+    login_window.title("Logowanie")
+    title_label = Label(login_window, text="Logowanie").grid(row=0, column=0, columnspan=2)
+    l_name_label = Label(login_window, text='Nazwisko').grid(row=1, column=0, sticky=W, padx=10, pady=5)
+    password_label = Label(login_window, text='Haslo').grid(row=2, column=0, sticky=W, padx=10, pady=5)
+
+
+    l_name_box = Entry(login_window)
+    l_name_box.grid(row=1, column=1, padx=10)
+    password_box = Entry(login_window)
+    password_box.grid(row=2, column=1, padx=10)
+
+    add_worker_button = Button(login_window, text="Zaloguj",
+                               command=lambda: sign_in_func(l_name_box,password_box)).grid(row=3, column=0,
+                                                                                       columnspan=2)
+    login_window.mainloop()
+
+
+
+def remove_car_query(id_box):
+    id = int(id_box.get())
+    query = "DELETE FROM samochod WHERE id = %s AND stan_wypożyczenia= 'niewypozyczony'"
+    data = (id,)
+    db_cursor.execute(query, data)
+    mydb.commit()
+
+
+def remove_car():
+    car_window = Tk()
+    car_window.geometry('400x400')
+    car_window.title('Usunięcie samochodu')
+    db_cursor.execute("SELECT id, marka, model, rok_produkcji, color FROM samochod WHERE stan_wypożyczenia= 'niewypozyczony'")
+    result = db_cursor.fetchall()
+    id_label = Label(car_window, text="Podaj id samochodu: ")
+    id_label.grid(row=0, column=0, columnspan=2)
+    id_box = Entry(car_window)
+    id_box.grid(row=0, column=2, columnspan=2, pady=20)
+    remove_button = Button(car_window, text="Usuń", command=lambda: remove_car_query(id_box))
+    remove_button.grid(row=0, column=4, columnspan=2)
+
+    id_label = Label(car_window, text="ID").grid(row=1, column=0)
+    f_name_label = Label(car_window, text="Marka").grid(row=1, column=1)
+    l_name_label = Label(car_window, text="Model").grid(row=1, column=2)
+    year_label = Label(car_window, text="Rok").grid(row=1, column=3)
+    color_label = Label(car_window, text="Kolor").grid(row=1, column=4)
+    for index, x in enumerate(result):
+        i = 0
+        for y in x:
+            car_label = Label(car_window, text=y).grid(row=index + 2, column=i)
+            i = i + 1
+
+
+def update():
+    root.destroy()
+    os.system('baza.py')
 
 
 rent_button = Button(root, text='Wypożyczenie samochodu', font=10, command=rent_car).grid(row=0, column=0, sticky=W,
@@ -412,25 +487,58 @@ client_removal_button = Button(root, text='Usunięcie klienta', font=10, command
                                                                                                     ipadx=48)
 modification_button = Button(root, text='Modyfikacja OC lub PT', font=10, command=OC_PT_modify).grid(row=4, column=0, sticky=W, padx=10,
                                                                                pady=5, ipady=5, ipadx=19)
-new_car_button = Button(root, text='Dodanie samochodu', font=10, command=new_car).grid(row=5, column=0, sticky=W,
+print(worker_id)
+if worker_id == 13:
+    new_car_button = Button(root, text='Dodanie samochodu', font=10, command=new_car).grid(row=5, column=0, sticky=W,
                                                                                       padx=10, pady=5, ipady=5,
                                                                                       ipadx=32)
-car_removal_button = Button(root, text='Usunięcie samochodu', font=10, state=DISABLED).grid(row=6, column=0, sticky=W,
+    car_removal_button = Button(root, text='Usunięcie samochodu', font=10, command=remove_car).grid(row=6, column=0, sticky=W,
                                                                                             padx=10, pady=5, ipady=5,
                                                                                             ipadx=27)
-new_worker_button = Button(root, text='Nowy pracownik', font=10, command=new_worker).grid(row=7, column=0,
-                                                                                                     sticky=W, padx=10,
-                                                                                                     pady=5, ipady=5,
-                                                                                                     ipadx=50)
-remove_worker_button = Button(root, text='Zwolnij pracownika', font=10, command=remove_worker).grid(row=8, column=0,
-                                                                                                     sticky=W, padx=10,
-                                                                                                     pady=5, ipady=5,
-                                                                                                     ipadx=39)
-salary_modification_button = Button(root, text='Zmiana wynagrodzenia', font=10, command=salary_modify).grid(row=9, column=0,
+    new_worker_button = Button(root, text='Nowy pracownik', font=10, command=new_worker).grid(row=7, column=0,
                                                                                                      sticky=W, padx=10,
                                                                                                      pady=5, ipady=5,
                                                                                                      ipadx=21)
-refresh_button = Button(root, text='Odswiez', font=10, command=show_available_cars).grid(row=10, column=0, sticky=W, padx=10, pady=5, ipady=5, ipadx=32)
-show_available_cars()
+    remove_worker_button = Button(root, text='Zwolnij pracownika', font=10, command=remove_worker).grid(row=8, column=0,
+                                                                                                     sticky=W, padx=10,
+                                                                                                     pady=5, ipady=5,
+                                                                                                     ipadx=21)
+    salary_modification_button = Button(root, text='Zmiana wynagrodzenia', font=10, command=salary_modify).grid(row=9, column=0,
+                                                                                                     sticky=W, padx=10,
+                                                                                                     pady=5, ipady=5,
+                                                                                                     ipadx=21)
+else:
+    new_car_button = Button(root, text='Dodanie samochodu', font=10, state=DISABLED).grid(row=5, column=0, sticky=W,
+                                                                                           padx=10, pady=5, ipady=5,
+                                                                                           ipadx=32)
+    car_removal_button = Button(root, text='Usunięcie samochodu', font=10, state=DISABLED).grid(row=6, column=0,
+                                                                                                    sticky=W,
+                                                                                                    padx=10, pady=5,
+                                                                                                    ipady=5,
+                                                                                                    ipadx=27)
+    new_worker_button = Button(root, text='Nowy pracownik', font=10, state=DISABLED).grid(row=7, column=0,
+                                                                                              sticky=W, padx=10,
+                                                                                              pady=5, ipady=5,
+                                                                                              ipadx=21)
+    remove_worker_button = Button(root, text='Zwolnij pracownika', font=10, state=DISABLED).grid(row=8, column=0,
+                                                                                                        sticky=W,
+                                                                                                        padx=10,
+                                                                                                        pady=5, ipady=5,
+                                                                                                        ipadx=21)
+    salary_modification_button = Button(root, text='Zmiana wynagrodzenia', font=10, state=DISABLED).grid(row=9,
+                                                                                                                column=0,
+                                                                                                                sticky=W,
+                                                                                                                padx=10,
+                                                                                                                pady=5,
+                                                                                                                ipady=5,
+                                                                                                                ipadx=21)
 
+sign_in_button = Button(root, text='Logowanie', font=10, command=sign_in).grid(row=10, column=0,
+                                                                                                     sticky=W, padx=10,
+                                                                                                     pady=5, ipady=5,
+                                                                                                     ipadx=21)
+refresh_button = Button(root, text='Odswiez', font=10, command=update).grid(row=11, column=0, sticky=W, padx=10, pady=5, ipady=5, ipadx=32)
+show_available_cars()
+#root.update()
 root.mainloop()
+
